@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AIS Smart Prevention Tool 2.0</title>
+  <meta name="description"
+    content="Maps of lake suitability to invasive species in Wisconsin, from the UW-Madison Center for Limnology.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="logos">
+      <span class="cfl-logo">
+        <img src="images/cfl.png" alt="UW-Madison Center for Limnology">
+      </span>
+      <img src="images/wdnr.png" alt="Wisconsin Department of Natural Resources">
+    </div>
+    <h1 class="site-title">AIS Smart Prevention Tool 2.0</h1>
+    <nav class="site-nav" aria-label="Main">
+      <a href="#/map">Interactive map</a>
+      <a href="#/about">About this tool</a>
+      <div class="menu">
+        <button type="button" class="menu-toggle" id="species-menu-toggle" aria-expanded="false"
+          aria-controls="species-menu-list">Species and Model Information</button>
+        <ul class="menu-list" id="species-menu-list" hidden>
+          <li><a href="#/species/zebra-mussel">Zebra Mussel</a></li>
+          <li><a href="#/species/rainbow-smelt">Rainbow Smelt</a></li>
+          <li><a href="#/species/round-goby">Round Goby</a></li>
+          <li><a href="#/species/rusty-crayfish">Rusty Crayfish</a></li>
+          <li><a href="#/species/spiny-water-flea">Spiny Water Flea</a></li>
+          <li><a href="#/species/eurasian-water-milfoil">Eurasian Water Milfoil</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-map" class="view view-map" data-title="Interactive map">
+      <div class="map-wrap">
+        <div id="map" role="application" aria-label="Map of lake suitability to invasive species in Wisconsin"></div>
+
+        <div class="map-panel" id="map-panel">
+          <div class="grip">Drag to move</div>
+          <div class="body">
+            <label class="visually-hidden" for="species-select">Species</label>
+            <select id="species-select">
+              <option value="">Select Species</option>
+              <option value="zebra-mussel">Zebra Mussel</option>
+              <option value="rainbow-smelt">Rainbow Smelt</option>
+              <option value="round-goby">Round Goby</option>
+              <option value="rusty-crayfish">Rusty Crayfish</option>
+              <option value="spiny-water-flea">Spiny Water Flea</option>
+              <option value="eurasian-water-milfoil">Eurasian Water Milfoil</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="map-status" id="map-status" role="status" aria-live="polite" hidden>
+          <span class="spinner" aria-hidden="true"></span><span id="map-status-text"></span>
+        </div>
+      </div>
+
+      <footer class="map-foot">
+        <div>
+          <p>The maps of lake suitability to invasive species presented here are based on statistical models and have
+            not been tested in the field.</p>
+          <p>App built by Michael Spear, Jake Vander Zanden, Hilary Dugan, Jake Walsh, Mona Papes, Jeff Maxted, Thomas
+            Shannon, and Daniel Haryanto.</p>
+        </div>
+      </footer>
+    </section>
+
+    <section id="view-about" class="view view-text" data-title="About this tool" hidden>
+      <article class="prose">
+        <h2>About the AIS Smart Prevention Tool 2.0</h2>
+        <p>Wisconsin's 15,000 lakes and 45,000 miles of streams are among the state's most valuable natural resources.
+          The abundance, diversity, and quality of Wisconsin’s aquatic resources provide the cornerstone of the state’s
+          multi-billion travel and tourism industry, in addition to a wide range of ecosystem services, recreational
+          opportunities, and aesthetic benefits. Unfortunately, there is an ever-expanding threat to our aquatic
+          resources. Nuisance exotic species have already taken over the Great Lakes, causing major ecological and
+          economic damage. Increasingly, they are spreading to inland lakes and streams by hitchhiking on recreational
+          boats, and spreading through interconnected waterways, rivers, and canals. What does the arrival of these new
+          nuisance species mean for our inland waters? And more importantly, what can we do to stop their spread and
+          reduce their impacts?</p>
+        <div class="figs figs-right"><img src="images/About_Fig1.png" alt="About Fig1" width="500" height="500"></div>
+        <p>In response to these questions, researchers at the Center for Limnology, University of Wisconsin – Madison
+          have been conducting studies that are relevant to understanding and managing aquatic invasive species in
+          Wisconsin. The central theme of this work can be summarized as ‘smart prevention.’ Because invasive species
+          typically cannot be eradicated once they establish, preventing their spread is generally the best management
+          option. But with approximately 15,000 lakes in Wisconsin, how and where should prevention efforts be focused?
+          Our research has aimed at identifying the lakes that are most <em>vulnerable</em> to invasive species: those
+          where invasive species are likely to be introduced, survive, and have negative impacts (Fig. 1). With such
+          knowledge in hand, prevention, enforcement, and monitoring efforts can be directed to these vulnerable sites.
+        </p>
+        <p>In addition to the <em>vulnerability</em> research described above, we have addressed a wide range of other
+          questions relating to the spread, impact, and management of aquatic invasive species (see species accounts
+          below). For example, we have found that impounded ecosystems are much more likely to be invaded than their
+          non-impounded counterparts.</p>
+        <p>The goal of this website is to help make the results of recent research on invasive species spread, impact,
+          and management conducted at the UW-Madison Center for Limnology available to lake managers, residents, and
+          concerned citizens. Development of the original AIS Smart Prevention tool was led by Mona Papes with
+          contributions from Jeff Maxted and hosted by the UW-Madison Applied Population Laboratory. Version 2.0 was
+          launched in March of 2019 and includes the original models plus two additional species, spiny water flea and
+          Eurasian watermilfoil. We hope that our efforts to communicate the result of this research to managers,
+          stakeholders, and concerned citizens are helpful in some way in the ongoing battle against invasive species in
+          Wisconsin, and elsewhere.</p>
+        <p>For support of our efforts to study and communicate the impacts of aquatic invasive species in our waters, we
+          acknowledge the support of the Wisconsin Department of Natural Resources, the National Science Foundation (the
+          North-Temperate Lakes Long-Term Ecological Research Site and the Bioeconomics of AIS project), and the Baldwin
+          Wisconsin Idea Endowment.</p>
+        <p>The maps of lake suitability to invasive species presented here are based on statistical models and have not
+          been tested in the field. Please familiarize yourself with the methods that were used to generate these
+          predictions. By using this tool, you agree to use the information presented here only in addition to other
+          information about invasive species, and NOT as maps of ACTUAL distribution of invasive species.</p>
+      </article>
+    </section>
+
+    <section id="view-zebra-mussel" class="view view-text" data-title="Zebra Mussel" hidden>
+      <article class="prose">
+        <h2>Zebra Mussel (<em>Dreissena polymorpha</em>)</h2>
+        <h4>Species Information</h4>
+        <p>Zebra mussels were first discovered in the Great Lakes in 1988 and quickly spread throughout the commercial
+          shipping waterways of the Mississippi River and Great Lakes drainages. Since then, recreational boaters and
+          anglers have spread zebra mussel to many inland lakes in the upper Midwest, and most recently to the western
+          U.S.</p>
+        <p>Though zebra mussels have spread to approximately 80 lakes in Wisconsin, in fact, many lakes are incapable of
+          supporting this species. Which lakes provide suitable habitat? And which ones are incapable of supporting
+          zebra mussels? We recently conducted an assessment of zebra mussel suitability for ~ 13,000 Wisconsin lakes.
+          Lakes were classified as suitable, borderline, or unsuitable based on measured or estimated dissolved calcium
+          concentrations (Papes et al. 2011). 14% of lakes were classified as suitable: suitable lakes were concentrated
+          in the southern portion of the state, though some suitable lakes were found in northern Wisconsin as well.</p>
+        <p>Zebra mussel invasions are cause for serious concern. They have caused millions of dollars of economic
+          losses, declines of native species, and have dramatically changed aquatic ecosystems. Zebra mussels
+          efficiently remove algae from the water column, while simultaneously excreting large amounts of organic
+          material and nutrients, which promotes bottom algae growth. Beyond this, it is unclear how many key aspects of
+          lake ecosystems change following zebra mussel invasion. To address this question, researchers recently
+          summarized and analyzed all of the available data on zebra mussel impacts (Higgins and Vander Zanden 2010).
+          The study found that zebra mussels cause a 40-80% decline in the entire planktonic (open water) food chain and
+          a 2-10x increase in the entire benthic (bottom) food chain. In other words, the effects are not confined to
+          the bottom of the food chain, but rather they reverberate through the entire food web.</p>
+        <div class="refs">
+          <p>Higgins, S.N. and M.J. Vander Zanden. 2010. What a difference a species makes: A meta-analysis of
+            dreissenid mussel impacts on freshwater ecosystems. Ecological Monographs 80 (2): 179-196.</p>
+          <p>Papes, M., et al. 2011. Invasive species research to meet the needs of resource management and planning.
+            Conservation Biology 25 (5): 867-872.</p>
+        </div>
+        <h4>Model Information</h4>
+        <p><strong>Assessment of lake suitability to zebra mussel invasion based on calcium concentrations</strong></p>
+        <p>Zebra mussel lake suitability analysis was carried out in 2009 by Monica Papes and Jake Vander Zanden, Center
+          for Limnology, UW – Madison.</p>
+        <p>Zebra mussel lake suitability represent thresholds of calcium concentration reflecting previous studies of
+          zebra mussel physiological requirements. Linear regression analysis was used to predict calcium concentration
+          values from available conductivity measurements for over 11,500 lakes in Wisconsin and Upper Michigan
+          Peninsula.</p>
+        <p>We reviewed the scientific literature addressing physiological constraints of zebra mussel and found seven
+          studies that measured the effects of water calcium concentrations (mg/l, hereafter Ca) on zebra mussel
+          development and growth (Jones and Ricciardi 2005, Allen and Ramcharan 2001, Hincks and Mackie 1997, Mellina
+          and Rasmussen 1994, Ramcharan et al. 1992, Strayer 1991, Sprung 1987).</p>
+        <p>A 95% confidence interval (CI) was applied to the distribution of the calcium concentration thresholds
+          identified in these studies to establish a lower limit for zebra mussel survival. The value obtained for this
+          lower threshold was 10 mg/l (mean mg/l Ca – 95% CI). Similarly, we calculated an upper threshold of 21 mg/l
+          (mean mg/l Ca + 95% CI).</p>
+        <p>These thresholds delimited three classes of lakes:</p>
+        <ul>
+          <li>not suitable to zebra mussel invasion (mg/l Ca &lt; 10), </li>
+          <li>borderline suitable (10&lt;mg/l Ca &lt; 21), </li>
+          <li>suitable (mg/l Ca &gt; 21).</li>
+        </ul>
+        <p>Since we were able to gather Ca values from only about 1000 lakes in Wisconsin, we developed a linear
+          regression function between Ca and conductivity based on two sources of data (EPA-Eastern Lake Survey, and CFL
+          Landscape Position Project) that had both Ca and conductivity values.</p>
+        <p>The linear regression function obtained as follow:</p>
+        <p>lnCa = -3.11018 + 1.2034 x lnConductivity</p>
+        <p>The linear regression function was then used to predict mg/l Ca for about 11,000 lakes in Wisconsin and the
+          Upper Peninsula of Michigan for which we had conductivity data. These data were gathered from a variety of
+          past limnological studies, but mostly from the Surface Water Resources Inventory carried out in Wisconsin
+          between 1960 and 1980 by the DNR and other state agencies.</p>
+        <p>The classification was done using ln-transformed thresholds:</p>
+        <ul>
+          <li>not suitable: lnCa&lt; 2.302;</li>
+          <li>borderline suitable: 2.302&lt; lnCa&lt; 3.044;</li>
+          <li>suitable: lnCa&gt;3.044).</li>
+        </ul>
+        <p>Our final dataset thus included over 11,500 lakes with Ca values (measured or predicted) from Wisconsin and
+          the Upper Peninsula of Michigan. We used it in Geographic Information Systems (GIS) to assign the lakes to
+          three different suitability classes to zebra mussel invasion, as described above.</p>
+        <p>About 5500 lakes with surface area &lt; 10 ha and 1300 lakes &gt; 10 ha were omitted from this study due to
+          lack of conductivity or Ca measurements.</p>
+        <div class="refs">
+          <p>Jones, L.A. and A. Ricciardi. 2005. Influence of physicochemical factors on the distribution and biomass of
+            invasive mussels (Dreissena polymorpha and Dreissena bugensis) in the St Lawrence River. Can. J. Fish.
+            Aquat. Sci. 62: 1953– 1962.</p>
+          <p>Allen, Y.C. and C.W. Ramcharan. 2001. Dreissena distribution in commercial waterways of the U.S.: using
+            failed invasions to identify limiting factors. Can. J. Fish. Aquat Sci. 58: 898–907.</p>
+          <p>Hincks, S.S. and G.L. Mackie. 1997. Effects of pH, calcium, alkalinity, hardness, and chlorophyll on the
+            survival, growth, and reproductive success of zebra mussel (Dreissena polymorpha) in Ontario lakes. Can. J.
+            Fish. Aquat. Sci. 54: 2049–2057.</p>
+          <p>Mellina, E. and J.B. Rasmussen. 1994. Patterns in the distribution and abundance of zebra mussel (Dreissena
+            polymorpha) in rivers and lakes in relation to substrate and other physicochemical factors. Can. J. Fish.
+            Aquat. Sci. 51: 1024-1036.</p>
+          <p>Ramcharan, C.W., D.K. Padilla, and S.I. Dodson. 1992. Models to predict potential occurrence and density of
+            the zebra mussel, Dreissena polymorpha. Can. J. Fish. Aquat. Sci. 49: 2611-2620.</p>
+          <p>Strayer et al 1991. Projected distribution of the zebra mussel, Dreissena polymorpha, in North America.
+            Can. J. Fish. Aquat. Sci., Vol. 48: 1389-1395.</p>
+          <p>Sprung, M. 1987. Ecological requirements of developing Dreissena polymorpha eggs. Arch. Hydrobiol. 79:
+            69-86.</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="view-rainbow-smelt" class="view view-text" data-title="Rainbow Smelt" hidden>
+      <article class="prose">
+        <h2>Rainbow Smelt (<em>Osmerus mordax</em>)</h2>
+        <h4>Species Information</h4>
+        <div class="figs figs-right"><img src="images/RainbowSmelt_Fig1.png" alt="RainbowSmelt Fig1" width="300"
+            height="300"></div>
+        <p>Rainbow smelt are native to coastal regions of eastern North America. They spread through the upper Great
+          Lakes during the 1920s and 30s, and have since spread to inland waters throughout the region. Currently, they
+          inhabit at least 24 inland Wisconsin lakes.</p>
+        <p>Rainbow smelt often become very abundant, and feed on the young of other fish species. As a result, they
+          reduce native fishes such as lake herring, lake whitefish, yellow perch and walleye. Among their many
+          documented effects, their invasion is responsible for the decline of walleye recruitment in Wisconsin lakes
+          (Mercado-Silva et al. 2007).</p>
+        <p>Rainbow smelt tend to inhabit large, deep, unproductive lakes. Mercado-Silva et al. (2006) identified &gt;
+          500 lakes in Wisconsin to be suitable for smelt invasion. Thus, there remains much potential for further
+          spread of this invasive fish.</p>
+        <div class="refs">
+          <p>Mercado-Silva, N., J.D. Olden, J.T. Maxted, T.R. Hrabik, M.J. Vander Zanden. 2006. Forecasting the spread
+            of invasive rainbow smelt in the Laurentian Great Lakes region of North America. Conservation Biology 20:
+            1740-1749.</p>
+          <p>Mercado-Silva, N., S. Gilbert, G.G. Sass, B.M. Roth, M.J. Vander Zanden. 2007. Impact of rainbow smelt
+            (Osmerus mordax) invasion on walleye (Sander vitreus) recruitment in Wisconsin lakes. Canadian Journal of
+            Fisheries and Aquatic Sciences 64: 1543-1550.</p>
+        </div>
+        <h4>Model Information</h4>
+        <p><strong>Assessment of lake suitability to rainbow smelt invasion based on information from native range in
+            Maine</strong></p>
+        <p>Methods as described in Mercado-Silva, N., J.D. Olden, J.T. Maxted, T.R. Hrabik, M.J. Vander Zanden. 2006.
+          Forecasting the spread of invasive rainbow smelt in the Laurentian Great Lakes region of North America.
+          Conservation Biology 20: 1740-1749.</p>
+        <p>Our objectives were to develop a model for rainbow smelt presence and absence based on their distribution in
+          their native range in coastal regions of Maine (U.S.A.) and to apply model predictions in other geographic
+          areas to forecast future invasion potential.</p>
+        <p>Limnological data and rainbow smelt distribution data for Maine lakes were obtained from databases managed by
+          the Public Educational Access to Environmental Information (PEARL) in Maine. We estimated that 354 Maine lakes
+          are within the native range of rainbow smelt. Lake morphometry and physical-chemistry variables were obtained
+          for 819 lakes from data sets in PEARL and from geographic information provided by Maine Department of
+          Environmental Protection.</p>
+        <p>We compiled information for Wisconsin inland lakes from various sources. Maximum lake depth, area, and
+          Secchi-disk readings were obtained from an extensive lake data set at the WDNR. pH information was obtained
+          from the STORET database of the U.S. Environmental Protection Agency (STORET-EPA), and shoreline perimeter was
+          calculated with a GIS (ESRI 2002) from data obtained from the WDNR. We obtained information for 5188 lakes in
+          Wisconsin, but data availability was uneven among lakes (lake area = 5188 lakes, Secchi-disk readings = 3891,
+          pH = 1190, maximum depth = 5142, shoreline perimeter = 1190).</p>
+        <p>We used classification trees (Breiman et al. 1984; Salford Systems 2002) to model rainbow smelt presence and
+          absence within their native range in Maine. This methodology uses a recursive partitioning algorithm to
+          repeatedly partition the data set according to the explanatory variables into a nested series of mutually
+          exclusive groups, each as homogeneous as possible with respect to the presence or absence of rainbow smelt
+          (see De’ath &amp; Fabricius 2000).</p>
+        <p>For Wisconsin lakes, the model had a correct classification rate of 89%. The model identified 553 new lakes
+          with the potential to be invaded by smelt. In Wisconsin and Ontario, &lt;5% of lakes capable of supporting
+          smelt currently do, indicating vast potential for future spread in both areas.</p>
+        <div class="refs">
+          <p>Breiman, L., J. H. Friedman, A. Olshen, and C. G. Stone. 1984. Classification and regression trees.
+            Wadsworth International Group, Belmont, California.</p>
+          <p>De’ath, G., and K. E. Fabricius. 2000. Classification and regression trees: a powerful yet simple technique
+            for ecological data analysis. Ecology 81:3178–3192.</p>
+          <p>Salford Systems. 2002. CART. California Statistical Software, San Diego.</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="view-round-goby" class="view view-text" data-title="Round Goby" hidden>
+      <article class="prose">
+        <h2>Round Goby (<em>Neogobius melanostomus</em>)</h2>
+        <h4>Species Information</h4>
+        <div class="figs figs-right"><img src="images/RoundGoby_Fig1.png" alt="RoundGoby Fig1" width="500" height="400">
+        </div>
+        <p>Round goby is a small benthic fish native to the Black and Caspian Seas. It first appeared in the Great Lakes
+          in 1990, and has since spread to all five Great Lakes. Round goby are currently spreading into coastal
+          tributary streams in Wisconsin and elsewhere (Kornis and Vander Zanden 2010). In Wisconsin, round gobies were
+          detected in 26 of 73 streams (36%), and were found more than 10 km upstream of Lake Michigan in nine separate
+          watersheds. We forecasted the future spread of round goby in Wisconsin’s Lake Michigan basin. Up to the first
+          stream barrier, 1369 km of stream are suitable (Fig. 1A). Within the watershed as a whole, 8878 km of stream
+          were suitable (Fig. 1B). These results highlight the role of the Great Lakes as a springboard for invasive
+          species to disperse into inland ecosystems (Kornis and Vander Zanden 2010). Current research is assessing
+          impacts of round goby in stream ecosystems (Kornis 2013).</p>
+        <div class="refs">
+          <p>Kornis, M. and M.J. Vander Zanden. 2010. Forecasting the distribution of invasive round goby in Wisconsin
+            tributaries to Lake Michigan. Canadian Journal of Fisheries and Aquatic Sciences 67 (3): 553-562.</p>
+          <p>Kornis, Matthew S., Sapna Sharma, and M. Jake Vander Zanden. 2013. Invasion success and impact of an
+            invasive fish, round goby, in Great Lakes tributaries. Diversity and Distributions 19 (2): 184-198.</p>
+        </div>
+        <h4>Model Information</h4>
+        <p><strong>Assessment of stream suitability to round goby invasion in Lake Michigan tributaries</strong></p>
+        <p>Based on Kornis, M.S. and M.J. Vander Zanden. 2010. Forecasting the distribution of the invasive round goby
+          (<em>Neogobius melanostomus</em>) in Wisconsin tributaries to Lake Michigan. Canadian Journal of Fisheries and
+          Aquatic Sciences 67(3): 553-562.</p>
+        <p>We developed a model for round goby presence and absence based on their distribution in Wisconsin (U.S.A.)
+          tributaries to Lake Michigan and applied model predictions to forecast future invasion potential. We were
+          precluded from using native range data because round gobies are historically limited to large lakes and the
+          lower reaches of large rivers.</p>
+        <p>Round goby distribution data were obtained from a field survey of all Wisconsin tributaries to Lake Michigan
+          (130 sites on 73 streams). For a given stream, sampling began near the mouth and continued upstream at sites
+          at least 1 km apart until no round gobies were detected. If round gobies were not present, we assumed they
+          were absent upstream of that site as well. Two collection methods were used to sample the range of stream
+          sizes in our study. Wade-able sites (&lt;1m in depth) with high water clarity were sampled using a
+          battery-powered backpack electrofishing unit with pulsed DC current. Such sites were electrofished for 20
+          minutes at a current of 3.5 to 4.0 amps, with focus on cobble or boulder substrate. Sites with low water
+          clarity and/or depths greater than 1m were sampled using an overnight set of 10 wire-mesh Gee-style minnow
+          traps baited with chicken liver. Probability of detection for both methods was assumed to be 1 in areas of
+          high round goby abundance. Probability of detection at sites where round gobies were rare was 0.75 for
+          electrofishing (determined by repeated sampling of sites where only 1 round goby was initially captured).
+          Probability of detection using minnow traps was not calculated but assumed to be at least 0.75 because round
+          gobies were more frequently detected by minnow traps than electrofishing and traps usually captured high
+          numbers of round gobies if they were present.</p>
+        <p>We compiled habitat information for Wisconsin streams from various sources. Water temperature, conductivity,
+          bankfull width, stream depth, and percent substrate composition were measured locally at each site by the
+          field survey team. Landscape-scale variables (watershed area, percent land use, stream gradient, watershed
+          slope, soil permeability, base-flow index, and mean July air temperature) and the coordinates of dams were
+          obtained from a global information system (GIS) database provided by the US Geological Survey, Great Lakes
+          Aquatic GAP Analysis Project. Landscape-scale variables were calculated on the scale of confluence-bound
+          stream segments.</p>
+        <p>We used generalized linear mixed models (using the “logit” or logistic regression function) to model round
+          goby presence/absence based on habitat factors in Wisconsin tributaries to Lake Michigan. Such models output
+          the probability of round goby presence for a given site based on the predictor. Models were evaluated using
+          the Bayesian information criterion (BIC) to select among models based on predictive ability. Best subsets
+          analysis was used to extract the 20 best models (based on BIC score) from all possible models (i.e. all
+          possible combinations of predictor variables). To test each of these models on independent data, each model
+          was validated using k-fold cross validation as recommended for presence/absence models by Fielding and Bell
+          (1997). Receiver operating characteristic (ROC) curves were used to determine the probability threshold
+          distinguishing “predicted present” from “predicted absent”; thresholds were selected using the minimized
+          difference threshold (MDT) criterion, which selects the probability value that minimizes the difference
+          between sensitivity and specificity (Jiménez-Valverde and Lobo 2007). We used Cohen’s Kappa, which measures
+          the proportion of agreement between actual and predicted data, as the primary statistic of model performance.
+          This allowed us to evaluate each of the 20 models in our candidate set for their ability to perform on
+          independent data (generated from the k-fold cross validation). This criterion was most appropriate given our
+          goal of forecasting round goby presence/absence at sites yet to be invaded. The best model based on this
+          criterion included watershed area, stream gradient, and watershed slope as predictor variables and was used to
+          generate forecasted range.</p>
+        <p>For Wisconsin tributaries to Lake Michigan, the model had a correct classification rate of 80%. The model
+          identified 1,369 km of stream downstream of impassable fish barriers (dams) as vulnerable to round goby
+          invasion. Currently, round gobies only occupy 20% (280 km) of these streams, indicating a large potential for
+          continued spread of round gobies in tributaries. The model also identified 7,482 km of streams upstream of
+          impassable fish barriers as vulnerable to round goby invasion. To invade these streams, round gobies would
+          need assistance from humans. This illustrates the vast potential for round gobies to invade inland streams and
+          highlights the importance of educational campaigns and species movement regulations in preventing the spread
+          of round gobies (and other invaders) upstream of dams.</p>
+        <div class="refs">
+          <p>Diana, C.M., Jonas, J.L., Claramunt, R.M., Fitzsimons, J.D., and Marsden, J.E. 2006. A comparison of
+            methods for sampling round goby in rocky littoral areas. N. Am. J. Fish. Manage. 26(3): 411-420.</p>
+          <p>Fielding, A.H., and Bell, J.F. 1997. A review of methods for the assessment of prediction errors in
+            conservation presence/absence models. Environ. Conserv. 24(1): 38-49.</p>
+          <p>Jiménez-Valverde, A., and Lobo, J.M. 2007. Threshold criteria for conversion of probability of species
+            presence to either/or presence-absence. Acta Oecol. 31(3): 361-369.</p>
+          <p>Phillips, E.C., Washek, M.E., Hertel, A.W., and Niebel, B.M. 2003. The round goby (Neogobius melanostomus)
+            in Pennsylvania tributary streams of Lake Erie. J. Great Lakes Res. 29(1): 34-40.</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="view-rusty-crayfish" class="view view-text" data-title="Rusty Crayfish" hidden>
+      <article class="prose">
+        <h2>Rusty Crayfish (<em>Orconectes rusticus</em>)</h2>
+        <h4>Species Information</h4>
+        <div class="figs figs-right figs-multi"><img src="images/RustyCrayfish_Fig1.png" alt="RustyCrayfish Fig1"
+            width="600" height="300"><img src="images/RustyCrayfish_Fig2.png" alt="RustyCrayfish Fig2" width="400"
+            height="300"></div>
+        <p>Rusty crayfish are native to streams of the Ohio River basin, and have recently spread throughout much of
+          North America. A recent study documented their rapid spread across the state, from 3% (pre-1980) to over 50%
+          (present day) of crayfish occurrence (Olden et al. 2006). This study also found that rusty crayfish tend to
+          displace native crayfish species.</p>
+        <p>Are there environmental factors that might limit the future distribution of rusty crayfish in Wisconsin?
+          Rusty crayfish do not survive in waters with dissolved Ca2+ concentrations below 2-3 mg/l. Unfortunately,
+          relatively few aquatic systems in Wisconsin fall below this level, indicating little potential to limit rusty
+          crayfish distributions (Vander Zanden and Maxted 2008). Current research is using statistical models to better
+          identify lakes and streams that are vulnerable to rusty crayfish invasion and impacts (Olden and Vander Zanden
+          2011).</p>
+        <p>Efforts to control or eradicate aquatic invasive species have achieved limited success, and much research is
+          needed to develop better methods to control invasive species. There is also a need to understand the
+          reversibility of ecosystem changes caused by aquatic invasive species. Researchers at the UW Center for
+          Limnology have been conducting experimental removal of invasive rusty crayfish in Sparkling Lake (Vilas
+          County) since 2001 (Hein et al. 2006; 2007). Removal efforts have produced sharp declines in rusty crayfish
+          populations, and the decline has benefitted from increased bass and walleye abundances due to fishing
+          regulation changes (Hein et al. 2006). Current research is assessing whether the rusty crayfish declines has
+          resulted in the recovery of the ecosystem.</p>
+        <p>We still know little about the impacts of rusty crayfish on freshwater ecosystems. For example, can native
+          species adapt to the presence of invasive species and find ways to coexist? Recent work on rusty
+          crayfish-virile crayfish interactions indicates that native crayfish do adapt to the presence of invasive
+          rusty crayfish, allowing them to potentially coexist (Hayes et al. 2009). Nevertheless, rusty crayfish have
+          many impacts on aquatic ecosystems, including reducing aquatic invertebrates (McCarthy et al. 2006; Roth et
+          al. 2006). Current work is investigating the implications of reduced invertebrate populations for fish, and
+          the extent to which they disrupt energy flow in aquatic food chains (Nilsson et al. 2012).</p>
+        <div class="refs">
+          <p>Hayes, N. M., K.J. Butkas, J.D. Olden, and M.J. Vander Zanden. 2009. Behavioural and growth differences
+            between experienced and naïve populations of a native crayfish in the presence of invasive rusty crayfish.
+            Freshwater Biology 54: 1876-1887.</p>
+          <p>Hein, C.L, B.M. Roth, A.R. Ives, and M.J Vander Zanden. 2006. Fish predation and trapping for rusty
+            crayfish (Orconectes rusticus) control: a whole-lake experiment. Canadian Journal of Fisheries and Aquatic
+            Sciences 63:383-393.</p>
+          <p>Hein, C.L., M.J. Vander Zanden, and J.J. Magnuson. 2007. Intensive trapping and increased fish predation
+            cause massive population decline of an invasive crayfish. Freshwater Biology 52: 1134-1146.</p>
+          <p>McCarthy, J.M., C.L. Hein, J.D. Olden, M.J. Vander Zanden. 2006. Coupling long-term studies with
+            meta-analysis to investigate impacts of invasive crayfish on zoobenthic communities. Freshwater Biology
+            51:224-235.</p>
+          <p>Nilsson, E., C. T. Solomon, K. A. Wilson, T. V. Willis, B. Larget, and M. J. Vander Zanden. 2012. Effects
+            of an invasive crayfish on trophic relationships in north‐temperate lake food webs. Freshwater Biology 57
+            (1): 10-23.</p>
+          <p>Olden, J.D., J. M. McCarthy, J. T. Maxted, W. W. Fetzer, M. J. Vander Zanden. 2006. The rapid spread of
+            rusty crayfish (Orconectes rusticus) with observations on native crayfish declines in Wisconsin (U.S.A.)
+            over the past 130 years. Biological Invasions 8:1621-1628.</p>
+          <p>Roth, B.M., C.L. Hein, and M.J. Vander Zanden. 2006. Using bioenergetics and stable isotopes to assess the
+            trophic role of rusty crayfish (Orconectes rusticus) in lake littoral zones. Canadian Journal of Fisheries
+            and Aquatic Sciences 63:335-344.</p>
+          <p>Vander Zanden, M.J. and J.T. Maxted. 2008. Species invasions in Wisconsin lakes and streams. Pages 423-438
+            In The vanishing present: Wisconsin’s changing lands, waters and wildlife. Edited by D.M. Waller and T.P.
+            Rooney. University of Chicago Press.</p>
+        </div>
+        <h4>Model Information</h4>
+        <p><strong>Forecasting the multi-staged invasion of rusty crayfish (Orconectes rusticus) in freshwater
+            ecosystems </strong></p>
+        <p>We used a multi-response artificial neural network (MANN) to model present-day (1985-2006) presence/absence
+          of Orconectes rusticus as a function of environmental and human-related factors describing the likelihood of
+          introduction and establishment. Our lake model included 9 variables describing human visitation, lake
+          morphology and water chemistry, and our stream model included 11 variables describing channel characteristics,
+          low flow regime, land use, superficial geology, and regional climate. We developed separate feed-forward MANNs
+          trained by the backpropagation algorithm to model 292 lakes and 546 stream sites. Using the MANNs, we
+          predicted the probability of occurrence for O. rusticus for 4,200 lakes and 35,855 stream segments
+          (representing 90,360 river kms) across the entire state of Wisconsin.</p>
+        <p>O. rusticus occurrence was highly predictable according to the MANN. The cross-validated neural network
+          correctly predicted O. rusticus in 93.2 % of the lakes and 94.3 % of the stream sites (cross-validated
+          estimates), in addition to exhibiting both high sensitivity and specificity. Model performance was
+          significantly greater than random based on Cohen’s Kappa for both habitat types.</p>
+        <div class="refs">
+          <p>Olden, J.D., M.J. Vander Zanden, P.T.J. Johnson. 2011. Assessing ecosystem vulnerability to invasive rusty
+            crayfish (Orconectes rusticus). Ecological Applications 21: 2587-2599.</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="view-spiny-water-flea" class="view view-text" data-title="Spiny Water Flea" hidden>
+      <article class="prose">
+        <h2>Spiny Water Flea (<em>Bythotrephes longimanus</em>)</h2>
+        <h4>Species Information</h4>
+        <p>The spiny water flea (SWF) is a free-swimming predatory crustacean, native to lakes of northern Europe and
+          Asia. This species was discovered in Lake Huron in 1984. It quickly spread through the Great Lakes, and within
+          a decade, had invaded hundreds of inland lakes in the Great Lakes region. SWF were discovered in Gile Flowage
+          (Iron County) in 2003 by researchers at the UW Center for Limnology. Soon after, additional populations were
+          discovered in Stormy Lake (Vilas County) in 2007 and the Madison chain of lakes (Mendota, Monona, Waubesa,
+          Kegonsa) in 2009.</p>
+        <p>The current spread of SWF in Wisconsin is cause for concern. SWF are a voracious predator upon native
+          zooplankton, and have caused dramatic declines in native zooplankton in Canadian lakes. The native zooplankton
+          play two key roles in lakes: they are food for small fish and they consume phytoplankton and thus help control
+          algal blooms. The long spine of SWF inhibits consumption by smaller fishes, highlighting their potential for
+          disrupting the food web.</p>
+        <p>Their impact on Wisconsin’s lakes is not yet well understood. Researchers at the UW Center for Limnology are
+          currently monitoring Stormy Lake and the Madison Lakes to understand their effects on water clarity, fishes,
+          native zooplankton, and lake food webs as a whole. The Madison Lakes are among the most well-studied lakes in
+          the world, and this unfortunate recent invasion does provide an opportunity to understand their impacts.</p>
+        <p>An urgent management challenge is to assess which lakes are vulnerable to spiny water flea invasion. One
+          study found that SWF tend to inhabit large, deep, clear lakes in their native range. Application of those
+          results to Wisconsin indicates that a large number of lakes are capable of supporting this invasive species.
+          Researchers at the UW Center for Limnology are currently developing statistical models that can be used to
+          identify which lakes are vulnerable to SWF (Papes et al. 2011).</p>
+        <div class="refs">
+          <p>Papes, M., et al. 2011. Invasive species research to meet the needs of resource management and planning.
+            Conservation Biology. 25 (5): 867-872.</p>
+        </div>
+        <h4>Model Information</h4>
+        <p><strong>Assessment of lake suitability to spiny water flea based on modeled lake temperatures</strong></p>
+        <p><em>Note: this project is a work in progress and the models presented here may be subject to changes as the
+            modeling improves.</em></p>
+        <p>The suitability analysis for spiny water flea (SWF) was carried out in 2018 by Jake Walsh in collaboration
+          with Jake Vander Zanden (UW-Madison), Jordan Read (USGS), and Gretchen Hansen (MNDNR/UMN-TC).</p>
+        <p><em>Background. </em>Spiny water flea is a cool water zooplankter and is sensitive to warm summer surface
+          temperatures at the southern edge of its range, which includes Wisconsin (Kerfoot et al. 2011, Walsh et al.
+          2016). We used a 10,774-lake dataset of daily modeled lake temperature profiles from three time periods
+          (1981-2001, 2040-2060, and 2080-2100) in Minnesota, Michigan, and Wisconsin (Winslow et al. 2017) to estimate
+          lake thermal suitability to SWF under contemporary and future projected lake thermal conditions. Water
+          temperatures were modeled using seven different global climate models, six of which include projections under
+          future climate change scenarios (see Winslow et al. 2017 for details). Notably, all six GCMs are modeled under
+          the most extreme emissions scenarios (RCP 8.5).</p>
+        <p><em>MaxEnt model fitting. </em>We modeled lake thermal suitability to SWF using a maximum entropy algorithm,
+          MaxEnt, a commonly used technique for modeling species distributions (Phillips et al. 2006), developing our
+          models using the package “maxnet” in R (Phillips 2017). The maxnet package fits environmental data to
+          occurrence data using lasso regularization of generalized linear models to generate the Maxent probability
+          distribution (Phillips 2017). Maxent is particularly useful for SDM modeling using presence only data
+          (essential here given just 40 confirmed occurrences and 10,744 background lakes) as well as estimating
+          non-linear effects of predictor variables (Phillips et al. 2006).</p>
+        <p>We selected three variables for model fitting: degree days above 20°C (SWF developmental rates plummet above
+          20°C; Lehman et al. 1997, Kim and Yan 2010), mean surface temperatures in October (°C; <em>Bythotrephes</em>
+          is most abundant in fall in our study region (Walsh et al. 2018); and log10 maximum observed lake depth (m;
+          since SWF is primarily pelagic, lake depth is the most likely morphological variable related to SWF habitat
+          variability in lakes; e.g., Young and Yan 2008). These variables are weakly correlated: cor(gdd_wtr_20c,
+          lake_depth) = -0.15, cor(gdd_wtr_20c, mean_surf_oct) = 0.51, cor(mean_surf_oct, lake_depth) = 0.63 (using
+          contemporary conditions under the GFDL GCM), but correlation among variables shouldn’t matter as much when
+          using Maxent relative to other niche modeling methods (Elith et al. 2011).</p>
+        <p>A key feature in MaxEnt modeling is the regularization multiplier, which essentially affects how tightly
+          fitted the model is to the occurrence data. If a model is too tightly fitted to the data, it risks being
+          ungeneralizable. Since we want to project our model into future lake temperature conditions, we increased the
+          default regularization multiplier, in effect “under-fitting” the model. We used a regularization multiplier
+          (“regmult”) of 2 (with the default being 1). Further, MaxEnt fits the models using multiple “feature classes”
+          to allow for nonlinear effects of environmental variables. We allowed the models to use all feature classes
+          (linear, quadratic, product, hinge, threshold), but note that with just 40 occurrences, the maxent algorithm
+          won’t use the product feature classes. However, the final models used nearly identical combinations of linear
+          and hinge features across all six GCMs (Fig. 1).</p>
+        <div class="figs figs-center"><img src="images/SWF_Fig1.png" alt="SWF Fig1" width="600" height="300"></div>
+        <p><strong>Fig. 1</strong>– Variable effects on raw maxent suitability output are plotted in colors that vary by
+          GCM.</p>
+        <p><em>Variable effects. </em>We found that increasing GDD &gt; 20°C had a negative effect on SWF suitability
+          while increasing lake depth had a positive effect on suitability (Fig. 1). Both of these findings are
+          consistent with our current understanding of SWF ecology. The effect of mean surface temperatures in October
+          on suitability was non-linear and U-shaped, possibly reflecting the positive effect of warming in a typically
+          cool season when SWF is most abundant (Fig. 1). Since temperatures in October aren’t expected to warm past SWF
+          thermal limits, any increases in temperature may increase developmental and population growth rates and may
+          offset the negative effects of warmer summer surface temperatures. It is worth noting that this trend toward
+          higher suitability at higher mean surface temperatures in October is driven by 11 of the 40 known occurrences
+          in the dataset and not by a small number of outlying occurrences. These lakes are warm in both summer and
+          fall, but tend to be deeper (e.g., &gt; 9 m maximum observed depth).</p>
+        <p><em>Results in entire study region</em>We defined suitability as any lake with a suitability score as high as
+          the lowest score in a lake with confirmed SWF presence. Averaging suitability scores across all GCM-produced
+          MaxEnt models, we found that roughly half of the lakes in our study region (5,204 of 10,774 lakes) would be
+          suitable for SWF under contemporary conditions (Table 1). This fraction is expected to decline substantially
+          with future warming (3,666 suitable lakes in 2090), though we note interesting non-linear patterns between
+          2050 and 2090 scenarios (3,165 lakes in 2050), likely due to the interaction between suitability and mean
+          surface temperatures in October.</p>
+        <p><strong>Table 1</strong>Model predictions (number of predicted presences where a presence is defined as a
+          suitability score at least as high as the score of the least suitable known occurrence) across each GCM and
+          time period. As a reminder: there are 10,774 total lakes in the dataset. Note: the mean is not the calculated
+          mean of the columns, but predictions from suitability scores averaged across all GCMs.</p>
+        <div class="figs figs-center"><img src="images/SWF_Table1.png" alt="SWF Table1" width="300" height="110"></div>
+        <p><em>Results for Wisconsin. </em>For the purposes of this online tool, we’re primarily interested in SWF
+          suitability Wisconsin. Of the 4,751 Wisconsin lakes in the dataset, 1,907 are predicted to be suitable under
+          contemporary conditions (40%), 921 are predicted to be suitable under 2050 conditions (19%), and 1,229 are
+          predicted to be suitable under 2090 conditions (26%) (Table 2).</p>
+        <p><strong>Table 2 </strong>– Model predictions for Wisconsin (4,751 lakes in Wisconsin with SWF suitability
+          data).</p>
+        <div class="figs figs-center"><img src="images/SWF_Table2.png" alt="SWF Table2" width="300" height="100"></div>
+        <div class="refs">
+          <p><br><br>Elith, J., S. J. Phillips, T. Hastie, M. Dudik, Y. E. Chee, and C. J. Yates. 2011. A statistical
+            explanation of MaxEnt for ecologists. Diversity and Distributions 17(1):43-57.</p>
+          <p>Kerfoot, W. C., F. Yousef, M. M. Hobmeier, R. P. Maki, S. T. Jarnagin, and J. H. Churchill. 2011.
+            Temperature, recreational fishing and diapause egg connections: dispersal of spiny water fleas (Bythotrephes
+            longimanus). Biological Invasions 13:2513–2531.</p>
+          <p>Kim, N., and N. D. Yan. 2010. Methods for rearing the invasive zooplankter Bythotrephes in the laboratory.
+            Limnology and Oceanography: Methods 8:552–561.</p>
+          <p>Lehman, J. T., D. M. Bilkovic, and C. Sullivan. 1997. Predicting development, metabolism and secondary
+            production for the invertebrate predator Bythotrephes. Freshwater Biology 38:343–352.</p>
+          <p>Phillips, S. J. 2017. maxnet: Fitting ‘Maxent’ species distribution models with ‘glmnet’. R package version
+            0.1.2. https://CRAN.R-project.org/package=maxnet </p>
+          <p>Phillips, S. J., R. P. Anderson, and R. E. Schapire. 2006. Maximum entropy modeling of species geographic
+            distributions. Ecological Modeling 190:231-259.</p>
+          <p>Walsh, J. R., S. E. Munoz, and M. J. Vander Zanden. 2016. Outbreak of an undetected invasive species
+            triggered by a climate anomaly. Ecosphere 7:10.1002/ecs2.1628.</p>
+          <p>Walsh, J. R., E. J. Pedersen, and M. J. Vander Zanden. 2018 Detecting species at low density: a general
+            theoretical framework and empirical test of the abundance-detectability relationship. Ecosphere 9(11):
+            e02475.</p>
+          <p>Winslow, L. A., G. J. A. Hansen, J. S. Read, and M. Notaro. 2017. Large-scale modeled contemporary and
+            future water temperature estimates for 10774 Midwestern U.S. Lakes. Scientific Data 4:170053.</p>
+          <p>Young, J. D., and N. D. Yan. 2008. Modification of the diel vertical migration of Bythotrephes longimanus
+            by the cold-water planktivore Coregonus artedi. Freshwater Biology 53(5):981-995.</p>
+        </div>
+        <p><strong>Metadata for understanding shapefile output</strong></p>
+        <p>Model threshold for suitability: ≥-10.1526; (this is the lowest raw suitability score for a lake with a known
+          SWF population)</p>
+        <p>Shapefile column names:</p>
+        <p>“lat” = latitude of the centroid of the lake shapefile</p>
+        <p>“long” = longitude of the centroid of the lake shapefile</p>
+        <p>“suitCont” = raw suitability score for the contemporary time period</p>
+        <p>“predCont” = binary suitability based on above threshold</p>
+        <p>“suit2050” = raw suitability score for the late century time period</p>
+        <p>“pred2050” = binary suitability based on above threshold</p>
+        <p>“suit2090” = raw suitability score for the late century time period</p>
+        <p>“pred2090” = binary suitability based on above threshold</p>
+        <p>“pa” = known SWF occurrences (1 = presence)</p>
+        <p>“RawSuit” = raw suitability score (redundant w/suitCont)</p>
+      </article>
+    </section>
+
+    <section id="view-eurasian-water-milfoil" class="view view-text" data-title="Eurasian Water Milfoil" hidden>
+      <article class="prose">
+        <h2>Eurasian Water Milfoil (<em>Myriophyllum spicatum</em>)</h2>
+        <h4>Species Information</h4>
+        <p><em>M. spicatum</em> is an invasive aquatic plant can be abundant in some waterbodies. The species is native
+          to Europe, Asia and North Africa. The precise date of introduction to the United States is unknown, but likely
+          occurred some time between 1880 and 1940 (Eiswerth et al. 2000). After the initial introduction, EWM spread
+          throughout the continental US and Canada (EDDMapS 2017). It is now present in over 800 Wisconsin waterbodies,
+          having steadily expanded its range northward after being introduced to southern Wisconsin during the 1960s
+          (Trebitz et al. 1993). When abundant in certain waterbodies, EWM forms thick mats that prevent navigation,
+          reduce property values and may affect native species (Boylen et al. 1999, Provencher et al. 2012). In 2011,
+          over half of the total funding for Wisconsin’s Aquatic Invasive Species control grant program was allocated to
+          M. spicatum, amounting to around $1-$2 million dollars annually, making it a high priority for an assessment
+          of invasion vulnerability.</p>
+        <div class="refs">
+          <p>Boylen, C. W., L. W. Eichler, and J. D. Madsen. 1999. Loss of native aquatic plant species in a community
+            dominated by Eurasian watermilfoil. Hydrobiologia 415:207-211.</p>
+          <p>EDDMapS. 2017. Early Detection &amp; Distribution Mapping System. The University of Georgia–Center for
+            Invasive Species and Ecosystem Health.</p>
+          <p>Eiswerth ME, Donaldson SG, Johnson WS. 2000. Potential Environmental Impacts and Economic Damages of
+            Eurasian Watermilfoil (Myriophyllum spicatum) in Western Nevada and Northeastern California. Weed Technology
+            14: 511-518.</p>
+          <p>Kosmidis I. 2017. brglm: Bias Reduction in Binary-Response Generalized Linear Models. R package version
+            0.6.1.</p>
+          <p>Provencher, B., D. J. Lewis, et al. 2012. Disentangling preferences and expectations in stated preference
+            analysis with respondent uncertainty: The case of invasive species prevention. Journal of Environmental
+            Economics and Management 64(2): 169-182.</p>
+          <p>Trebitz, A. S., S. A. Nichols, S. R. Carpenter, and R. C. Lathrop. 1993. Patterns of vegetation change in
+            Lake Wingra following a Myriophyllum spicatum decline. Aquatic Botany 46:325-340.</p>
+        </div>
+        <h4>Model Information</h4>
+        <p><strong>Predicted occurrence of Eurasian Watermilfoil in Wisconsin based on physical, geographic and land use
+            factors.</strong></p>
+        <p><em>Note: Unlike the other species models displayed in this tool, the Eurasian watermilfoil model measures
+            probability of occurrence, which incorporates dispersal-related risk of introduction in addition to
+            environmental parameters influencing lake suitability. However, for the sake of consistent scheming with the
+            other species in this tool, our map labels “present” / “absent” predictions as “suitable” or “unsuitable.”
+          </em></p>
+        <p>The analysis of lake suitability and dispersal-related risk of introduction was conducted in 2017 by Alison
+          Mikulyuk (WDNR) in collaboration with E. R. Kujawa (Lake Champlain Basin Program), C. M. Hein (WDNR), S. Van
+          Egeren (WDNR), and M. J. Vander Zanden (UW-Madison).</p>
+        <p><em>Background: </em>We sampled aquatic plant communities on 657 waterbodies from May to October, 2005 –
+          2016. EWM presence was observed using a rake sampler deployed from a boat at points arranged in a sampling
+          grid that covered the surface of the waterbody (Mikulyuk et al. 2010). We assembled information on predictors
+          with a hypothesized relationship to EWM occurrence for 9,285 Wisconsin lakes over 1 ha in surface area.
+          Variables were related water quality and morphometry as well as dispersal, land use, geology and climate. The
+          inclusion of dispersal and human use factors means that model results should not be interpreted solely as
+          environmental suitability values, but should be taken to also reflect the likelihood of introduction.</p>
+        <p><em>Developing the model: </em>We built species distribution models using logistic regression employed in a
+          generalized linear modelling framework. The procedure employs a maximum likelihood optimization algorithm to
+          estimate intercept and slope parameters for an equation that returns the probability that a given lake has
+          been invaded. Model fitting was performed using Firth’s method of bias reduction in R using the function and
+          package ‘brglm’ (Kosmidis 2017). We used a five-fold cross-validation procedure to evaluate model performance,
+          developing the model on a randomly selected 80% of the data, and comparing predicted probabilities for the
+          remaining 20% of data to observed presence/absence (Fielding and Bell 1997). We evaluated cross-validated
+          model performance with a receiver operating characteristic analysis using the function ‘roc’ in package ‘pROC’
+          (Hosmer et al. 2013, Hussner et al. 2017). We also calculated overall model deviance, the percentage of
+          deviance explained by the model (D2) and Tjur’s coefficient of discrimination, which can be interpreted much
+          in the same way as an R2 value for linear regressions (Caffrey and Monahan 2006). All model performance
+          statistics were averaged across cross-validations.</p>
+        <p><em>Results: </em>Logistic regression models predicting M. spicatum presence performed well, with AUC = 0.81.
+          The probability of M. spicatum occurrence was statistically significantly related to water quality,
+          morphometry, climate, dispersal and geology. The probability of M. spicatum occurrence was positively related
+          to road density, surface area, maximum air temperature of the warmest month and lake maximum depth. Occurrence
+          probability was negatively related to %CaO in the watershed, annual temperature range and mean distance from
+          all source populations. Mean cross-validated deviance was 515, Tjur’s coefficient of determination was 0.32,
+          and the amount of deviance accounted for by the model was 22%. M. spicatum has broad environmental tolerances
+          and can survive under a wide range of conditions, but it is not equally likely to be introduced to lakes
+          across the state. Our occurrence model identifies locations where it is likely to be present, predicting that
+          around a quarter of lakes in Wisconsin currently have or are likely to be invaded by M. spicatum.</p>
+        <div class="refs">
+          <p>Caffrey, J. M. and C. Monahan. 2006. Control of Myriophyllum verticillatum L. in Irish canals by turion
+            removal. Hydrobiologia 570:211-215.</p>
+          <p>Fielding, A. H. and J. F. Bell. 1997. A review of methods for the assessment of prediction errors in
+            conservation presence/absence models. Environmental Conservation 24:38-49.</p>
+          <p>Hosmer, D. W., S. Lemeshow, and R. X. Sturdivant. 2013. Applied logistic regression. 3rd edition. Wiley,
+            New York.</p>
+          <p>Hussner, A., I. Stiers, M. J. J. M. Verhofstad, E. S. Bakker, B. M. C. Grutters, J. Haury, J. L. C. H. van
+            Valkenburg, G. Brundu, J. Newman, J. S. Clayton, L. W. J. Anderson, and D. Hofstra. 2017. Management and
+            control methods of invasive alien freshwater aquatic plants: A review. Aquatic Botany 136:112-137.</p>
+          <p>Mikulyuk, A., J. Hauxwell, P. Rasmussen, S. Knight, K. I. Wagner, M. E. Nault, and D. Ridgely. (2010).
+            Testing a methodology for assessing plant communities in temperate inland lakes. Lake and Reservoir
+            Management 26:54-62.</p>
+          <p>Olden JD, Tamayo M (2014) Incentivizing the Public to Support Invasive Species Management: Eurasian Milfoil
+            Reduces Lakefront Property Values. PLoS ONE 9: e110458.</p>
+          <p>Kosmidis I (2017). brglm: Bias Reduction in Binary-Response Generalized Linear Models. R package version
+            0.6.1.</p>
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
